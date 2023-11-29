@@ -96,4 +96,5 @@ model.fit(train_objectives=[(train_dataloader, train_loss)],
           optimizer_params = {'lr': args.lr},
           )
 
-model.save('output/simcse-model')
+model.save(model_save_path)
+
