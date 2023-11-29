@@ -25,7 +25,7 @@ parser.add_argument("--model_name", required=True)
 parser.add_argument("--max_passages", default=0, type=int)
 parser.add_argument("--epochs", default=1, type=int)
 parser.add_argument("--pooling", default="mean")
-parser.add_argument("--size_dataset", default=1)
+parser.add_argument("--size_dataset", default=1, type=float)
 parser.add_argument("--lr", default=2e-5, type=float)
 parser.add_argument("--checkpoint_save_steps", default=1000, type=int)
 
@@ -41,6 +41,8 @@ max_seq_length = args.max_seq_length
 num_epochs = args.epochs
 size_dataset = args.size_dataset
 checkpoint_save_steps = args.checkpoint_save_steps
+
+
 
 model_save_path = f'output/train_msmacro_vi-{model_name.replace("/", "-")}-batch_size_{train_batch_size}-{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}'
 
@@ -69,32 +71,33 @@ def preprocess_item(item):
 preprocessed_data = [preprocess_item(item) for item in train_vi]
 
 subset_size = int(size_dataset * len(preprocessed_data)) 
+print(subset_size)
 subset_train_dataset = Subset(preprocessed_data, range(subset_size))
 
-word_embedding_model = models.Transformer(model_name, max_seq_length=max_seq_length)
-pooling_model = models.Pooling(word_embedding_model.get_word_embedding_dimension())
-model = SentenceTransformer(modules=[word_embedding_model, pooling_model])
+# word_embedding_model = models.Transformer(model_name, max_seq_length=max_seq_length)
+# pooling_model = models.Pooling(word_embedding_model.get_word_embedding_dimension())
+# model = SentenceTransformer(modules=[word_embedding_model, pooling_model])
 
 
-train_data = [
-    InputExample(texts=[item["question"], item["context"]]) if item["label"] == 0
-    else InputExample(texts=[item["question"], item["context"]],
-                      label=item["label"])
-    for item in subset_train_dataset
-]
+# train_data = [
+#     InputExample(texts=[item["question"], item["context"]]) if item["label"] == 0
+#     else InputExample(texts=[item["question"], item["context"]],
+#                       label=item["label"])
+#     for item in subset_train_dataset
+# ]
 
-train_dataloader = DataLoader(train_data, batch_size=train_batch_size, shuffle=True)
-train_loss = losses.MultipleNegativesRankingLoss(model)
-warmup_steps = math.ceil(len(train_dataloader) * num_epochs * 0.1)
+# train_dataloader = DataLoader(train_data, batch_size=train_batch_size, shuffle=True)
+# train_loss = losses.MultipleNegativesRankingLoss(model)
+# warmup_steps = math.ceil(len(train_dataloader) * num_epochs * 0.1)
 
-model.fit(train_objectives=[(train_dataloader, train_loss)],
-          epochs=num_epochs,
-          warmup_steps=warmup_steps,
-          checkpoint_path=model_save_path,
-          use_amp=True,
-          checkpoint_save_steps=checkpoint_save_steps,
-          optimizer_params = {'lr': args.lr},
-          )
+# model.fit(train_objectives=[(train_dataloader, train_loss)],
+#           epochs=num_epochs,
+#           warmup_steps=warmup_steps,
+#           checkpoint_path=model_save_path,
+#           use_amp=True,
+#           checkpoint_save_steps=checkpoint_save_steps,
+#           optimizer_params = {'lr': args.lr},
+#           )
 
-model.save(model_save_path)
+# model.save(model_save_path)
 
