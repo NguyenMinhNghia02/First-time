@@ -5,7 +5,7 @@ def train_and_save_model():
     model = ...  # Your trained model
 
     # Save the model to the 'output' directory
-    output_path = "/kaggle/working/output/model.pkl"
+    output_path = "/kaggle/working/First-time"
     joblib.dump(model, output_path)
     
     print(f"Model saved to: {output_path}")
