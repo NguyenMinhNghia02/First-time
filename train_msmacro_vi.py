@@ -27,7 +27,6 @@ parser.add_argument("--epochs", default=1, type=int)
 parser.add_argument("--pooling", default="mean")
 parser.add_argument("--size_dataset", default=1, type=float)
 parser.add_argument("--lr", default=2e-5, type=float)
-parser.add_argument("--checkpoint_save_steps", default=1000, type=int)
 
 args = parser.parse_args()
 
@@ -40,11 +39,9 @@ max_passages = args.max_passages
 max_seq_length = args.max_seq_length            
 num_epochs = args.epochs
 size_dataset = args.size_dataset
-checkpoint_save_steps = args.checkpoint_save_steps
 
 
-
-model_save_path = f'output/train_msmacro_vi-{model_name.replace("/", "-")}-batch_size_{train_batch_size}-{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}'
+model_save_path = f'output/train_msmacro_vi'
 
 train_vi = {}  
 json_train_vi_filepath = "/kaggle/input/qna-vietnamese/QnA/data_mrc/msmarco/vi_msmarco_train.json"
@@ -94,7 +91,6 @@ model.fit(train_objectives=[(train_dataloader, train_loss)],
           warmup_steps=warmup_steps,
           checkpoint_path=model_save_path,
           use_amp=True,
-          checkpoint_save_steps=checkpoint_save_steps,
           optimizer_params = {'lr': args.lr},
           )
 
