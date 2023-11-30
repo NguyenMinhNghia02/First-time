@@ -29,6 +29,8 @@ parser.add_argument("--size_dataset", default=1, type=float)
 parser.add_argument("--lr", default=2e-5, type=float)
 parser.add_argument("--scheduler", default='WarmupLinear', type=str)
 parser.add_argument("--weight_decay", default=0.1, type=float)
+parser.add_argument("--warmup_steps", default=10000, type=int)
+
 args = parser.parse_args()
 
 logging.info(str(args))
@@ -40,7 +42,7 @@ max_passages = args.max_passages
 max_seq_length = args.max_seq_length            
 num_epochs = args.epochs
 size_dataset = args.size_dataset
-
+warmup_steps = args.warmup_steps
 
 model_save_path = f'output/train_msmacro_vi'
 
@@ -85,7 +87,7 @@ train_data = [
 
 train_dataloader = DataLoader(train_data, batch_size=train_batch_size, shuffle=True)
 train_loss = losses.MultipleNegativesRankingLoss(model)
-warmup_steps = math.ceil(len(train_dataloader) * num_epochs * 0.1)
+
 
 model.fit(train_objectives=[(train_dataloader, train_loss)],
           epochs=num_epochs,
