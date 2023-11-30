@@ -27,7 +27,8 @@ parser.add_argument("--epochs", default=1, type=int)
 parser.add_argument("--pooling", default="mean")
 parser.add_argument("--size_dataset", default=1, type=float)
 parser.add_argument("--lr", default=2e-5, type=float)
-
+parser.add_argument("--scheduler", default='WarmupLinear', type=str)
+parser.add_argument("--weight_decay", default=0.1, type=float)
 args = parser.parse_args()
 
 logging.info(str(args))
@@ -88,10 +89,14 @@ warmup_steps = math.ceil(len(train_dataloader) * num_epochs * 0.1)
 
 model.fit(train_objectives=[(train_dataloader, train_loss)],
           epochs=num_epochs,
+          scheduler=args.scheduler,
           warmup_steps=warmup_steps,
           checkpoint_path=model_save_path,
           use_amp=True,
           optimizer_params = {'lr': args.lr},
+          weight_decay=args.weight_decay,
+          save_best_model= True,
+          checkpoint_save_total_limit = 1
           )
 
 model.save(model_save_path)
